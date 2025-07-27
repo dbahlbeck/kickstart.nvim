@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -283,7 +283,44 @@ require('lazy').setup({
       },
     },
   },
+  {
+    'nvim-neotest/neotest',
+    dependencies = {
+      'nvim-neotest/nvim-nio',
+      'nvim-lua/plenary.nvim',
+      'antoinemadec/FixCursorHold.nvim',
+      'nvim-treesitter/nvim-treesitter',
+      { 'fredrikaverpil/neotest-golang', version = '*' }, -- Installation
+    },
+    config = function()
+      local neotest_golang_opts = {} -- Specify custom configuration
+      local neotest = require 'neotest'
+      vim.keymap.set('n', '<Leader>ta', function()
+        neotest.run.run(vim.fn.expand '%')
+        neotest.output_panel.open()
+        neotest.summary.open()
+      end, { desc = 'Run all tests' })
+      vim.keymap.set('n', '<Leader>to', function()
+        neotest.output_panel.open()
+      end, { desc = 'Open test output panel' })
+      vim.keymap.set('n', '<Leader>toc', function()
+        neotest.output_panel.clear()
+      end, { desc = 'Clear output panel' })
+      vim.keymap.set('n', '<Leader>tt', function()
+        neotest.run.run()
+        neotest.output.open()
+      end, { desc = 'run nearest test' })
+      vim.keymap.set('n', '<Leader>ts', function()
+        neotest.summary.open()
+      end, { desc = 'open summary' })
 
+      neotest.setup {
+        adapters = {
+          require 'neotest-golang'(neotest_golang_opts), -- Registration
+        },
+      }
+    end,
+  },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -672,7 +709,7 @@ require('lazy').setup({
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        -- gopls = {},
+        gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -1011,6 +1048,8 @@ require('lazy').setup({
     },
   },
 })
+
+-- require('neotest').summary.open()
 
 -- The line beneath this is called `modeline`. See `:help modeline`
 -- vim: ts=2 sts=2 sw=2 et
