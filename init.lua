@@ -1000,7 +1000,47 @@ require('lazy').setup({
     --    - Show your current context: https://github.com/nvim-treesitter/nvim-treesitter-context
     --    - Treesitter + textobjects: https://github.com/nvim-treesitter/nvim-treesitter-textobjects
   },
-
+  {
+    'nvim-neo-tree/neo-tree.nvim',
+    branch = 'v3.x',
+    dependencies = {
+      'nvim-lua/plenary.nvim',
+      'MunifTanjim/nui.nvim',
+      'nvim-tree/nvim-web-devicons', -- optional, but recommended
+    },
+    lazy = false, -- neo-tree will lazily load itself
+    config = function()
+      require('neo-tree').setup {
+        sources = {
+          'filesystem',
+          'buffers',
+          'git_status',
+        },
+        source_selector = {
+          winbar = true,
+          statusline = false,
+        },
+        git_status = {
+          added = '', -- or "✚"
+          modified = '', -- or ""
+          deleted = '✖', -- this can only be used in the git_status source
+          renamed = '󰁕', -- this can only be used in the git_status source
+          untracked = '',
+          ignored = '',
+          unstaged = '󰄱',
+          staged = '',
+          conflict = '',
+        },
+      }
+      vim.api.nvim_create_autocmd('VimEnter', {
+        callback = function()
+          if vim.fn.argc() == 0 then
+            vim.cmd 'Neotree show'
+          end
+        end,
+      })
+    end,
+  },
   -- The following comments only work if you have downloaded the kickstart repo, not just copy pasted the
   -- init.lua. If you want these files, they are in the repository, so you can just download them and
   -- place them in the correct locations.
